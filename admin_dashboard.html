@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FUZE Admin Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-primary-blue: #0072ce;
+            --color-accent-yellow: #ffcc01;
+            --color-accent-green: #6da34d;
+            --color-muted-gray: #c5c5c5;
+            --color-white: #ffffff;
+            --color-black: #000000;
+            --font-heading: 'Bricolage Grotesque', sans-serif;
+            --font-body: 'DM Sans', sans-serif;
+            --spacing-xs: 8px;
+            --spacing-sm: 16px;
+            --spacing-md: 24px;
+            --spacing-lg: 32px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            font-size: 15px;
+            line-height: 1.5;
+            background-color: var(--color-black);
+            color: var(--color-muted-gray);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--spacing-md);
+        }
+
+        header {
+            background-color: rgba(0, 0, 0, 0.51);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        h1 {
+            font-family: var(--font-heading);
+            font-size: 32px;
+            font-weight: 400;
+            letter-spacing: -1px;
+            color: var(--color-white);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .stat-card {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: var(--spacing-md);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--color-muted-gray);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .stat-value {
+            font-family: var(--font-heading);
+            font-size: 36px;
+            font-weight: 400;
+            color: var(--color-primary-blue);
+        }
+
+        .controls {
+            display: flex;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-md);
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 300px;
+            padding: 10px var(--spacing-md);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 30px;
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--color-white);
+            font-family: var(--font-body);
+            font-size: 15px;
+            outline: none;
+        }
+
+        .search-input::placeholder {
+            color: rgba(197, 197, 197, 0.5);
+        }
+
+        .filter-select {
+            padding: 10px var(--spacing-md);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 30px;
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--color-white);
+            font-family: var(--font-body);
+            font-size: 15px;
+            outline: none;
+        }
+
+        .submissions-table {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background-color: rgba(255, 255, 255, 0.08);
+        }
+
+        th {
+            padding: var(--spacing-sm);
+            text-align: left;
+            font-weight: 600;
+            color: var(--color-white);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: var(--spacing-sm);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        tr:hover {
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+
+        .score {
+            font-weight: 600;
+        }
+
+        .score.high {
+            color: var(--color-accent-green);
+        }
+
+        .score.medium {
+            color: var(--color-accent-yellow);
+        }
+
+        .score.low {
+            color: #ff6b6b;
+        }
+
+        .trl-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            background-color: rgba(0, 114, 206, 0.2);
+            color: var(--color-primary-blue);
+        }
+
+        .action-btn {
+            padding: 6px 16px;
+            border: none;
+            border-radius: 20px;
+            background-color: var(--color-primary-blue);
+            color: var(--color-white);
+            font-family: var(--font-body);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background-color: #005a9e;
+        }
+
+        .export-btn {
+            background-color: var(--color-accent-green);
+        }
+
+        .export-btn:hover {
+            background-color: #5a8a3d;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background-color: #1a1a1a;
+            margin: 50px auto;
+            padding: var(--spacing-lg);
+            max-width: 800px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .close {
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--color-muted-gray);
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: var(--color-white);
+        }
+
+        .detail-row {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-sm) 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: var(--color-white);
+        }
+
+        .detail-value {
+            color: var(--color-muted-gray);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: var(--spacing-lg);
+            color: rgba(197, 197, 197, 0.5);
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            .search-input {
+                min-width: 100%;
+            }
+
+            table {
+                font-size: 13px;
+            }
+
+            th, td {
+                padding: var(--spacing-xs);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>FUZE Submission Admin Dashboard</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Statistics Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Submissions</div>
+                <div class="stat-value" id="statTotal">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Average Score</div>
+                <div class="stat-value" id="statAvgScore">0.0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">SAM.gov Registered</div>
+                <div class="stat-value" id="statSAM">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">High TRL (e7)</div>
+                <div class="stat-value" id="statHighTRL">0</div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <input
+                type="text"
+                class="search-input"
+                id="searchInput"
+                placeholder="Search by company name, technology, category..."
+            >
+            <select class="filter-select" id="categoryFilter">
+                <option value="">All Categories</option>
+                <option value="UAS">UAS</option>
+                <option value="Counter-Drone">Counter-Drone</option>
+                <option value="Electronic Warfare">Electronic Warfare</option>
+                <option value="Energy">Energy</option>
+                <option value="Other">Other</option>
+            </select>
+            <button class="action-btn export-btn" onclick="exportData()">Export CSV</button>
+        </div>
+
+        <!-- Submissions Table -->
+        <div class="submissions-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Company</th>
+                        <th>Technology</th>
+                        <th>Category</th>
+                        <th>TRL</th>
+                        <th>Score</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="submissionsBody">
+                    <tr>
+                        <td colspan="7" class="empty-state">Loading submissions...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Submission Detail Modal -->
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2 style="color: var(--color-white); margin-bottom: var(--spacing-md);">Submission Details</h2>
+            <div id="detailContent"></div>
+        </div>
+    </div>
+
+    <script>
+        let allSubmissions = [];
+
+        // Fetch statistics
+        async function fetchStatistics() {
+            try {
+                const response = await fetch('/api/statistics');
+                const stats = await response.json();
+
+                document.getElementById('statTotal').textContent = stats.total_submissions || 0;
+                document.getElementById('statAvgScore').textContent = (stats.avg_score || 0).toFixed(1);
+                document.getElementById('statSAM').textContent = stats.sam_registered || 0;
+                document.getElementById('statHighTRL').textContent = stats.high_trl || 0;
+            } catch (error) {
+                console.error('Error fetching statistics:', error);
+            }
+        }
+
+        // Fetch all submissions
+        async function fetchSubmissions() {
+            try {
+                const response = await fetch('/api/submissions');
+                allSubmissions = await response.json();
+                displaySubmissions(allSubmissions);
+            } catch (error) {
+                console.error('Error fetching submissions:', error);
+                document.getElementById('submissionsBody').innerHTML =
+                    '<tr><td colspan="7" class="empty-state">Error loading submissions</td></tr>';
+            }
+        }
+
+        // Display submissions in table
+        function displaySubmissions(submissions) {
+            const tbody = document.getElementById('submissionsBody');
+
+            if (submissions.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No submissions found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = submissions.map(sub => {
+                const score = sub.capability_score || 0;
+                const scoreClass = score >= 7 ? 'high' : score >= 4 ? 'medium' : 'low';
+                const date = new Date(sub.created_at).toLocaleDateString();
+
+                return `
+                    <tr>
+                        <td>${sub.company_name || 'N/A'}</td>
+                        <td>${sub.technology_name || 'N/A'}</td>
+                        <td>${sub.technology_category || 'N/A'}</td>
+                        <td><span class="trl-badge">TRL ${sub.trl_level || 'N/A'}</span></td>
+                        <td><span class="score ${scoreClass}">${score.toFixed(1)}</span></td>
+                        <td>${date}</td>
+                        <td>
+                            <button class="action-btn" onclick="viewDetails(${sub.id})">View</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // View submission details
+        async function viewDetails(id) {
+            try {
+                const response = await fetch(`/api/submissions/${id}`);
+                const submission = await response.json();
+
+                const detailContent = document.getElementById('detailContent');
+                detailContent.innerHTML = `
+                    <div class="detail-row">
+                        <div class="detail-label">Company Name</div>
+                        <div class="detail-value">${submission.company_name || 'N/A'}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Contact Email</div>
+                        <div class="detail-value">${submission.contact_email || 'N/A'}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Technology Name</div>
+                        <div class="detail-value">${submission.technology_name || 'N/A'}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Description</div>
+                        <div class="detail-value">${submission.technology_description || 'N/A'}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Category</div>
+                        <div class="detail-value">${submission.technology_category || 'N/A'}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">TRL Level</div>
+                        <div class="detail-value">${submission.trl_level || 'N/A'}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Funding Pathway</div>
+                        <div class="detail-value">${submission.funding_pathway || 'N/A'}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Requested Amount</div>
+                        <div class="detail-value">$${submission.funding_amount_requested?.toLocaleString() || 'N/A'}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Capability Score</div>
+                        <div class="detail-value">${submission.capability_score?.toFixed(1) || 'N/A'} / 10</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">AI Assessment</div>
+                        <div class="detail-value">${submission.ai_assessment || 'N/A'}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Recommendation</div>
+                        <div class="detail-value">${submission.recommendation || 'N/A'}</div>
+                    </div>
+                `;
+
+                document.getElementById('detailModal').style.display = 'block';
+            } catch (error) {
+                console.error('Error fetching submission details:', error);
+                alert('Failed to load submission details');
+            }
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('detailModal').style.display = 'none';
+        }
+
+        // Export data to CSV
+        function exportData() {
+            if (allSubmissions.length === 0) {
+                alert('No data to export');
+                return;
+            }
+
+            const headers = [
+                'ID', 'Company', 'Email', 'Technology', 'Category', 'TRL',
+                'Score', 'Funding Pathway', 'Amount', 'Date'
+            ];
+
+            const rows = allSubmissions.map(sub => [
+                sub.id,
+                sub.company_name || '',
+                sub.contact_email || '',
+                sub.technology_name || '',
+                sub.technology_category || '',
+                sub.trl_level || '',
+                sub.capability_score || '',
+                sub.funding_pathway || '',
+                sub.funding_amount_requested || '',
+                new Date(sub.created_at).toLocaleDateString()
+            ]);
+
+            const csvContent = [
+                headers.join(','),
+                ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+            ].join('\n');
+
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `fuze_submissions_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Search and filter
+        document.getElementById('searchInput').addEventListener('input', filterSubmissions);
+        document.getElementById('categoryFilter').addEventListener('change', filterSubmissions);
+
+        function filterSubmissions() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const category = document.getElementById('categoryFilter').value;
+
+            const filtered = allSubmissions.filter(sub => {
+                const matchesSearch = !searchTerm ||
+                    (sub.company_name || '').toLowerCase().includes(searchTerm) ||
+                    (sub.technology_name || '').toLowerCase().includes(searchTerm) ||
+                    (sub.technology_category || '').toLowerCase().includes(searchTerm);
+
+                const matchesCategory = !category || sub.technology_category === category;
+
+                return matchesSearch && matchesCategory;
+            });
+
+            displaySubmissions(filtered);
+        }
+
+        // Close modal on outside click
+        window.onclick = function(event) {
+            const modal = document.getElementById('detailModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        };
+
+        // Initialize dashboard
+        fetchStatistics();
+        fetchSubmissions();
+
+        // Refresh data every 30 seconds
+        setInterval(() => {
+            fetchStatistics();
+            fetchSubmissions();
+        }, 30000);
+    </script>
+</body>
+</html>

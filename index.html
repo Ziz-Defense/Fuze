@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FUZE Submission Portal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-primary-blue: #0072ce;
+            --color-accent-yellow: #ffcc01;
+            --color-accent-green: #6da34d;
+            --color-muted-gray: #c5c5c5;
+            --color-white: #ffffff;
+            --color-black: #000000;
+            --font-heading: 'Bricolage Grotesque', sans-serif;
+            --font-body: 'DM Sans', sans-serif;
+            --spacing-xs: 8px;
+            --spacing-sm: 16px;
+            --spacing-md: 24px;
+            --spacing-lg: 32px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            font-size: 17px;
+            line-height: 1.36em;
+            background-color: var(--color-black);
+            color: var(--color-muted-gray);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            max-width: 700px;
+            margin: 0 auto;
+            background-color: var(--color-black);
+        }
+
+        .chat-header {
+            background-color: rgba(0, 0, 0, 0.51);
+            height: 70px;
+            display: flex;
+            align-items: center;
+            padding: 0 var(--spacing-md);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .chat-header h1 {
+            font-family: var(--font-heading);
+            font-size: 28px;
+            font-weight: 400;
+            letter-spacing: -1px;
+            color: var(--color-white);
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: var(--spacing-md);
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+        }
+
+        .chat-messages::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: var(--color-primary-blue);
+            border-radius: 4px;
+        }
+
+        .message {
+            display: flex;
+            gap: var(--spacing-sm);
+            max-width: 80%;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .message.assistant {
+            align-self: flex-start;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .message.user .message-avatar {
+            background-color: var(--color-accent-yellow);
+            color: var(--color-black);
+        }
+
+        .message.assistant .message-avatar {
+            background-color: var(--color-primary-blue);
+            color: var(--color-white);
+        }
+
+        .message-content {
+            background-color: rgba(255, 255, 255, 0.05);
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: 8px;
+            word-wrap: break-word;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .message.user .message-content {
+            background-color: var(--color-primary-blue);
+            color: var(--color-white);
+            border: 1px solid var(--color-primary-blue);
+        }
+
+        .message.assistant .message-content {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--color-muted-gray);
+        }
+
+        .chat-input-container {
+            padding: var(--spacing-md);
+            background-color: rgba(0, 0, 0, 0.51);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .chat-input-wrapper {
+            display: flex;
+            gap: var(--spacing-sm);
+            max-width: 100%;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px var(--spacing-md);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 30px;
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--color-white);
+            font-family: var(--font-body);
+            font-size: 17px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .chat-input::placeholder {
+            color: rgba(197, 197, 197, 0.5);
+        }
+
+        .chat-input:focus {
+            border-color: var(--color-primary-blue);
+            background-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .send-button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 30px;
+            background-color: var(--color-primary-blue);
+            color: var(--color-white);
+            font-family: var(--font-body);
+            font-size: 17px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .send-button:hover {
+            background-color: #005a9e;
+            transform: scale(1.02);
+        }
+
+        .send-button:active {
+            transform: scale(0.98);
+        }
+
+        .send-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .chat-header {
+                height: 60px;
+                padding: 0 var(--spacing-sm);
+            }
+
+            .chat-header h1 {
+                font-size: 22px;
+            }
+
+            .chat-messages {
+                padding: var(--spacing-sm);
+            }
+
+            .message {
+                max-width: 90%;
+            }
+
+            .message-avatar {
+                width: 32px;
+                height: 32px;
+                font-size: 14px;
+            }
+
+            .message-content {
+                font-size: 16px;
+                padding: var(--spacing-xs) var(--spacing-sm);
+            }
+
+            .chat-input-container {
+                padding: var(--spacing-sm);
+            }
+
+            .chat-input {
+                font-size: 16px;
+                padding: 10px var(--spacing-sm);
+            }
+
+            .send-button {
+                padding: 10px var(--spacing-sm);
+                font-size: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .send-button {
+                padding: 10px 16px;
+            }
+        }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: rgba(197, 197, 197, 0.4);
+            text-align: center;
+            padding: var(--spacing-lg);
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: var(--spacing-md);
+            color: var(--color-primary-blue);
+            opacity: 0.5;
+        }
+
+        .empty-state-text {
+            font-family: var(--font-heading);
+            font-size: 22px;
+            margin-bottom: var(--spacing-xs);
+            letter-spacing: -0.5px;
+            color: var(--color-muted-gray);
+        }
+    </style>
+    <!-- Optional: Load API key from config.js (create from config.example.js) -->
+    <script src="config.js"></script>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1>FUZE Submission Portal</h1>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            <div class="empty-state">
+                <div class="empty-state-icon">🎯</div>
+                <div class="empty-state-text">Army FUZE Submission</div>
+                <div>Connecting you with an AI assessment specialist...</div>
+            </div>
+        </div>
+
+        <div class="chat-input-container">
+            <div class="chat-input-wrapper">
+                <input
+                    type="text"
+                    class="chat-input"
+                    id="messageInput"
+                    placeholder="Type your message..."
+                    autocomplete="off"
+                >
+                <button class="send-button" id="sendButton">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const chatMessages = document.getElementById('chatMessages');
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+
+        // IMPORTANT: Configure your OpenAI API key
+        // Create a config.js file with: window.OPENAI_API_KEY = 'your-key-here';
+        // Or hardcode it below (but NEVER commit to git)
+        const OPENAI_API_KEY = window.OPENAI_API_KEY || '';
+
+        let messageCount = 0;
+        let conversationHistory = [];
+        let submissionData = {};
+
+        // FUZE-specific system prompt for conversational intake
+        const SYSTEM_PROMPT = `You are an Army FUZE submission assessment specialist. Your role is to conduct a friendly, conversational interview with innovators submitting technology to the Army FUZE program.
+
+ABOUT ARMY FUZE:
+Army FUZE is a venture-capital-style program investing ~$750M/year in defense technology companies through xTech competitions, SBIR/STTR contracts, Technology Maturation Initiative (TMI), and Manufacturing Technology (ManTech) programs. Priority areas include: UAS (drones), counter-drone tech, electronic warfare, and energy resiliency.
+
+YOUR TASK:
+Guide users through a natural conversation to gather the following information:
+1. Company basics (name, contact, size, type)
+2. Technology/product (name, detailed description, category, unique value proposition)
+3. Military and commercial applications
+4. Technical maturity (TRL 1-9, MRL 1-10, development stage)
+5. Intellectual property status
+6. Team size and expertise
+7. Funding pathway (xTech, SBIR/STTR, Direct Phase II, TMI, ManTech)
+8. Funding amount requested
+9. Previous FUZE awards (if any)
+10. Development timeline
+11. Government registrations (SAM.gov, DSIP status)
+
+CONVERSATIONAL STYLE:
+- Be warm, encouraging, and professional
+- Ask 1-2 questions at a time, not all at once
+- Use natural language - make it feel like a conversation, not a form
+- Acknowledge their answers and show genuine interest
+- If they're unsure about something (like TRL), briefly explain it
+- Extract information even if they don't use exact terminology
+- At the end, provide a capability assessment with scoring and recommendations
+
+TRL SCALE (for reference):
+TRL 1-3: Basic research
+TRL 4-6: Proof of concept to prototype
+TRL 7-8: Demonstrated in operational environment
+TRL 9: Full deployment
+
+ASSESSMENT CRITERIA:
+- Technology readiness (TRL/MRL)
+- Alignment with FUZE priorities
+- Team capability
+- Commercial viability
+- Government registration status
+
+Start by warmly welcoming them and asking about their company and innovation.`;
+
+        // Initialize conversation with system prompt
+        conversationHistory.push({
+            role: 'system',
+            content: SYSTEM_PROMPT
+        });
+
+        function addMessage(text, sender) {
+            // Remove empty state on first message
+            if (messageCount === 0) {
+                chatMessages.innerHTML = '';
+            }
+            messageCount++;
+
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            avatar.textContent = sender === 'user' ? 'U' : 'A';
+
+            const content = document.createElement('div');
+            content.className = 'message-content';
+            content.textContent = text;
+
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(content);
+
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            return content; // Return content div for streaming updates
+        }
+
+        async function callOpenAI(userMessage) {
+            conversationHistory.push({
+                role: 'user',
+                content: userMessage
+            });
+
+            try {
+                const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${OPENAI_API_KEY}`
+                    },
+                    body: JSON.stringify({
+                        model: 'gpt-4',
+                        messages: conversationHistory,
+                        max_tokens: 500,
+                        temperature: 0.7
+                    })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error?.message || 'API request failed');
+                }
+
+                const data = await response.json();
+                const assistantMessage = data.choices[0].message.content;
+
+                conversationHistory.push({
+                    role: 'assistant',
+                    content: assistantMessage
+                });
+
+                return assistantMessage;
+            } catch (error) {
+                console.error('OpenAI API Error:', error);
+                return `Error: ${error.message}`;
+            }
+        }
+
+        async function sendMessage() {
+            const text = messageInput.value.trim();
+            if (!text) return;
+
+            // Disable input while processing
+            sendButton.disabled = true;
+            messageInput.disabled = true;
+
+            addMessage(text, 'user');
+            messageInput.value = '';
+
+            // Show typing indicator
+            const typingContent = addMessage('Thinking...', 'assistant');
+
+            // Call OpenAI API
+            const response = await callOpenAI(text);
+
+            // Update message with actual response
+            typingContent.textContent = response;
+
+            // Re-enable input
+            sendButton.disabled = false;
+            messageInput.disabled = false;
+            messageInput.focus();
+        }
+
+        sendButton.addEventListener('click', sendMessage);
+
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        // Initialize with AI greeting
+        async function initializeChat() {
+            // Show typing indicator
+            const typingContent = addMessage('Initializing...', 'assistant');
+
+            try {
+                const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${OPENAI_API_KEY}`
+                    },
+                    body: JSON.stringify({
+                        model: 'gpt-4',
+                        messages: conversationHistory,
+                        max_tokens: 300,
+                        temperature: 0.8
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to initialize');
+                }
+
+                const data = await response.json();
+                const greeting = data.choices[0].message.content;
+
+                conversationHistory.push({
+                    role: 'assistant',
+                    content: greeting
+                });
+
+                typingContent.textContent = greeting;
+            } catch (error) {
+                console.error('Initialization error:', error);
+                typingContent.textContent = 'Welcome to the Army FUZE Submission Portal! I\'m here to help assess your technology submission. Let\'s start with your company name and what innovation you\'re bringing to the table.';
+            }
+        }
+
+        // Start the conversation when page loads
+        initializeChat();
+
+        // Focus input
+        messageInput.focus();
+    </script>
+</body>
+</html>
