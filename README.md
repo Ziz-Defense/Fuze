@@ -26,6 +26,7 @@ Army FUZE is a venture-capital-style program investing ~$750M/year in defense te
 
 ### Chat-Centric Submission
 - Natural conversational AI interface (no forms)
+- **Voice input with OpenAI Whisper** - Speak your responses instead of typing
 - Guided intake process with intelligent follow-up questions
 - Automatic extraction of structured data from conversation
 - Real-time TRL/MRL assessment and explanation
@@ -117,7 +118,10 @@ npm start
 
 1. Navigate to http://localhost:3000/
 2. The AI specialist will greet you automatically
-3. Answer questions naturally in the chat (1-2 questions at a time)
+3. Answer questions naturally - either **type** or **click the microphone 🎤 to speak**
+   - Click microphone once to start recording (button turns red and pulses)
+   - Click again to stop recording and auto-transcribe your speech to text
+   - Or simply type your responses traditionally
 4. The system extracts and structures your information
 5. Receive capability assessment and recommendations at the end
 
