@@ -2,11 +2,16 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const multer = require('multer');
 const path = require('path');
 const db = require('./database');
+const FormData = require('form-data');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Configure multer for file uploads (in-memory storage)
+const upload = multer({ storage: multer.memoryStorage() });
 
 // Middleware
 app.use(cors());
@@ -106,6 +111,82 @@ app.get('/api/statistics', (req, res) => {
             res.json(stats);
         }
     });
+});
+
+// OpenAI Proxy Endpoints (keeps API key secure on server)
+
+// Chat completions proxy
+app.post('/api/chat', async (req, res) => {
+    const apiKey = process.env.OPENAI_API_KEY;
+
+    if (!apiKey) {
+        return res.status(500).json({ error: 'OpenAI API key not configured on server' });
+    }
+
+    try {
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKey}`
+            },
+            body: JSON.stringify(req.body)
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            return res.status(response.status).json(error);
+        }
+
+        const data = await response.json();
+        res.json(data);
+    } catch (error) {
+        console.error('OpenAI API error:', error);
+        res.status(500).json({ error: 'Failed to call OpenAI API' });
+    }
+});
+
+// Audio transcription proxy (Whisper)
+app.post('/api/transcribe', upload.single('file'), async (req, res) => {
+    const apiKey = process.env.OPENAI_API_KEY;
+
+    if (!apiKey) {
+        return res.status(500).json({ error: 'OpenAI API key not configured on server' });
+    }
+
+    if (!req.file) {
+        return res.status(400).json({ error: 'No audio file provided' });
+    }
+
+    try {
+        // Create form data with the audio file
+        const formData = new FormData();
+        formData.append('file', req.file.buffer, {
+            filename: 'audio.webm',
+            contentType: req.file.mimetype
+        });
+        formData.append('model', req.body.model || 'whisper-1');
+
+        const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${apiKey}`,
+                ...formData.getHeaders()
+            },
+            body: formData
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            return res.status(response.status).json(error);
+        }
+
+        const data = await response.json();
+        res.json(data);
+    } catch (error) {
+        console.error('Whisper API error:', error);
+        res.status(500).json({ error: 'Failed to transcribe audio' });
+    }
 });
 
 // Serve frontend

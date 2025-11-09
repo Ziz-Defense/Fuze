@@ -348,8 +348,6 @@
             color: var(--color-muted-gray);
         }
     </style>
-    <!-- Optional: Load API key from config.js (create from config.example.js) -->
-    <script src="config.js"></script>
 </head>
 <body>
     <div class="chat-container">
@@ -385,11 +383,6 @@
         const messageInput = document.getElementById('messageInput');
         const sendButton = document.getElementById('sendButton');
         const micButton = document.getElementById('micButton');
-
-        // IMPORTANT: Configure your OpenAI API key
-        // Create a config.js file with: window.OPENAI_API_KEY = 'your-key-here';
-        // Or hardcode it below (but NEVER commit to git)
-        const OPENAI_API_KEY = window.OPENAI_API_KEY || '';
 
         // Voice recording variables
         let mediaRecorder;
@@ -484,11 +477,11 @@ Start by warmly welcoming them and asking about their company and innovation.`;
             });
 
             try {
-                const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                // Call backend proxy endpoint (keeps API key secure on server)
+                const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${OPENAI_API_KEY}`
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
                         model: 'gpt-4',
@@ -557,11 +550,6 @@ Start by warmly welcoming them and asking about their company and innovation.`;
         }
 
         async function transcribeAudio(audioBlob) {
-            if (!OPENAI_API_KEY) {
-                alert('OpenAI API key not configured. Please set up config.js');
-                return;
-            }
-
             micButton.disabled = true;
             messageInput.placeholder = 'Transcribing...';
 
@@ -570,11 +558,9 @@ Start by warmly welcoming them and asking about their company and innovation.`;
                 formData.append('file', audioBlob, 'audio.webm');
                 formData.append('model', 'whisper-1');
 
-                const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+                // Call backend proxy endpoint (keeps API key secure on server)
+                const response = await fetch('/api/transcribe', {
                     method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${OPENAI_API_KEY}`
-                    },
                     body: formData
                 });
 
@@ -646,11 +632,11 @@ Start by warmly welcoming them and asking about their company and innovation.`;
             const typingContent = addMessage('Initializing...', 'assistant');
 
             try {
-                const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                // Call backend proxy endpoint (keeps API key secure on server)
+                const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${OPENAI_API_KEY}`
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
                         model: 'gpt-4',
