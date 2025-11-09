@@ -159,11 +159,15 @@ app.post('/api/transcribe', upload.single('file'), async (req, res) => {
     }
 
     try {
-        // Create form data with the audio file
+        // Create form data with the audio file (use Blob from buffer)
+        const { Readable } = require('stream');
         const formData = new FormData();
-        formData.append('file', req.file.buffer, {
+
+        // Convert buffer to stream for form-data library
+        const bufferStream = Readable.from(req.file.buffer);
+        formData.append('file', bufferStream, {
             filename: 'audio.webm',
-            contentType: req.file.mimetype
+            contentType: req.file.mimetype || 'audio/webm'
         });
         formData.append('model', req.body.model || 'whisper-1');
 
@@ -177,15 +181,19 @@ app.post('/api/transcribe', upload.single('file'), async (req, res) => {
         });
 
         if (!response.ok) {
-            const error = await response.json();
-            return res.status(response.status).json(error);
+            const errorText = await response.text();
+            console.error('OpenAI API error:', response.status, errorText);
+            return res.status(response.status).json({
+                error: 'Transcription failed',
+                details: errorText
+            });
         }
 
         const data = await response.json();
         res.json(data);
     } catch (error) {
         console.error('Whisper API error:', error);
-        res.status(500).json({ error: 'Failed to transcribe audio' });
+        res.status(500).json({ error: 'Failed to transcribe audio', details: error.message });
     }
 });
 
