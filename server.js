@@ -24,93 +24,89 @@ app.use(express.static(__dirname));
 // API Routes
 
 // Create new submission
-app.post('/api/submissions', (req, res) => {
-    const submissionData = req.body;
-
-    db.saveSubmission(submissionData, (err, result) => {
-        if (err) {
-            console.error('Error saving submission:', err);
-            res.status(500).json({ error: 'Failed to save submission' });
-        } else {
-            res.status(201).json({
-                message: 'Submission saved successfully',
-                submissionId: result.id
-            });
-        }
-    });
+app.post('/api/submissions', async (req, res) => {
+    try {
+        const submissionData = req.body;
+        const result = await db.saveSubmission(submissionData);
+        res.status(201).json({
+            message: 'Submission saved successfully',
+            submissionId: result.id
+        });
+    } catch (error) {
+        console.error('Error saving submission:', error);
+        res.status(500).json({ error: 'Failed to save submission' });
+    }
 });
 
 // Get all submissions
-app.get('/api/submissions', (req, res) => {
-    db.getAllSubmissions((err, submissions) => {
-        if (err) {
-            console.error('Error fetching submissions:', err);
-            res.status(500).json({ error: 'Failed to fetch submissions' });
-        } else {
-            res.json(submissions);
-        }
-    });
+app.get('/api/submissions', async (req, res) => {
+    try {
+        const submissions = await db.getAllSubmissions();
+        res.json(submissions);
+    } catch (error) {
+        console.error('Error fetching submissions:', error);
+        res.status(500).json({ error: 'Failed to fetch submissions' });
+    }
 });
 
 // Get single submission by ID
-app.get('/api/submissions/:id', (req, res) => {
-    const id = req.params.id;
-
-    db.getSubmissionById(id, (err, submission) => {
-        if (err) {
-            console.error('Error fetching submission:', err);
-            res.status(500).json({ error: 'Failed to fetch submission' });
-        } else if (!submission) {
+app.get('/api/submissions/:id', async (req, res) => {
+    try {
+        const id = req.params.id;
+        const submission = await db.getSubmissionById(id);
+        if (!submission) {
             res.status(404).json({ error: 'Submission not found' });
         } else {
             res.json(submission);
         }
-    });
+    } catch (error) {
+        console.error('Error fetching submission:', error);
+        res.status(500).json({ error: 'Failed to fetch submission' });
+    }
 });
 
 // Update submission
-app.put('/api/submissions/:id', (req, res) => {
-    const id = req.params.id;
-    const updateData = req.body;
-
-    db.updateSubmission(id, updateData, (err, result) => {
-        if (err) {
-            console.error('Error updating submission:', err);
-            res.status(500).json({ error: 'Failed to update submission' });
-        } else if (result.changes === 0) {
+app.put('/api/submissions/:id', async (req, res) => {
+    try {
+        const id = req.params.id;
+        const updateData = req.body;
+        const result = await db.updateSubmission(id, updateData);
+        if (result.changes === 0) {
             res.status(404).json({ error: 'Submission not found' });
         } else {
             res.json({ message: 'Submission updated successfully' });
         }
-    });
+    } catch (error) {
+        console.error('Error updating submission:', error);
+        res.status(500).json({ error: 'Failed to update submission' });
+    }
 });
 
 // Delete submission
-app.delete('/api/submissions/:id', (req, res) => {
-    const id = req.params.id;
-
-    db.deleteSubmission(id, (err, result) => {
-        if (err) {
-            console.error('Error deleting submission:', err);
-            res.status(500).json({ error: 'Failed to delete submission' });
-        } else if (result.changes === 0) {
+app.delete('/api/submissions/:id', async (req, res) => {
+    try {
+        const id = req.params.id;
+        const result = await db.deleteSubmission(id);
+        if (result.changes === 0) {
             res.status(404).json({ error: 'Submission not found' });
         } else {
             res.json({ message: 'Submission deleted successfully' });
         }
-    });
+    } catch (error) {
+        console.error('Error deleting submission:', error);
+        res.status(500).json({ error: 'Failed to delete submission' });
+    }
 });
 
 // Get statistics
-app.get('/api/statistics', (req, res) => {
-    db.getStatistics((err, stats) => {
-        if (err) {
-            console.error('Error fetching statistics:', err);
-            res.status(500).json({ error: 'Failed to fetch statistics' });
-        } else {
-            res.json(stats);
-        }
-    });
+app.get('/api/statistics', async (req, res) => {
+    try {
+        const stats = await db.getStatistics();
+        res.json(stats);
+    } catch (error) {
+        console.error('Error fetching statistics:', error);
+        res.status(500).json({ error: 'Failed to fetch statistics' });
+    }
 });
 
 // OpenAI Proxy Endpoints (keeps API key secure on server)

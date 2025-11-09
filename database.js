@@ -1,214 +1,180 @@
-const sqlite3 = require('sqlite3').verbose();
-const path = require('path');
+const { createClient } = require('@supabase/supabase-js');
 
-// Create/connect to SQLite database
-const dbPath = path.join(__dirname, 'fuze_submissions.db');
-const db = new sqlite3.Database(dbPath, (err) => {
-    if (err) {
-        console.error('Error opening database:', err.message);
-    } else {
-        console.log('Connected to SQLite database');
-        initializeDatabase();
-    }
-});
+// Initialize Supabase client
+const supabase = createClient(
+    process.env.SUPABASE_URL || '',
+    process.env.SUPABASE_ANON_KEY || ''
+);
 
 // Initialize database schema
-function initializeDatabase() {
-    const createTableQuery = `
-        CREATE TABLE IF NOT EXISTS submissions (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-
-            -- Company Information
-            company_name TEXT,
-            contact_email TEXT,
-            contact_phone TEXT,
-            company_size TEXT,
-            company_type TEXT,
-
-            -- Technology Details
-            technology_name TEXT,
-            technology_description TEXT,
-            detailed_description TEXT,
-            technology_category TEXT,
-            unique_value_proposition TEXT,
-            military_applications TEXT,
-            commercial_applications TEXT,
-
-            -- Technical Maturity
-            trl_level INTEGER,
-            mrl_level INTEGER,
-            development_stage TEXT,
-            ip_status TEXT,
-
-            -- Team Information
-            team_size INTEGER,
-            team_expertise TEXT,
-
-            -- Funding Information
-            funding_pathway TEXT,
-            funding_amount_requested REAL,
-            previous_fuze_awards TEXT,
-            previous_fuze_amount REAL,
-            development_timeline TEXT,
-
-            -- Government Registrations
-            sam_gov_registered BOOLEAN,
-            dsip_registered BOOLEAN,
-
-            -- Assessment
-            capability_score REAL,
-            ai_assessment TEXT,
-            recommendation TEXT,
-
-            -- Metadata
-            conversation_transcript TEXT,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-        )
-    `;
-
-    db.run(createTableQuery, (err) => {
-        if (err) {
-            console.error('Error creating table:', err.message);
-        } else {
-            console.log('Submissions table ready');
-        }
-    });
+async function initializeDatabase() {
+    try {
+        // Note: Table creation should be done via Supabase dashboard SQL editor
+        // This function is kept for consistency but table should exist already
+        console.log('✅ Supabase client initialized');
+        console.log('📋 Ensure submissions table exists in Supabase dashboard');
+    } catch (error) {
+        console.error('❌ Error initializing Supabase:', error.message);
+    }
 }
 
+// Initialize on module load
+initializeDatabase();
+
 // Save a new submission
-function saveSubmission(data, callback) {
-    const query = `
-        INSERT INTO submissions (
-            company_name, contact_email, contact_phone, company_size, company_type,
-            technology_name, technology_description, detailed_description, technology_category,
-            unique_value_proposition, military_applications, commercial_applications,
-            trl_level, mrl_level, development_stage, ip_status,
-            team_size, team_expertise,
-            funding_pathway, funding_amount_requested, previous_fuze_awards,
-            previous_fuze_amount, development_timeline,
-            sam_gov_registered, dsip_registered,
-            capability_score, ai_assessment, recommendation,
-            conversation_transcript
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `;
+async function saveSubmission(data) {
+    try {
+        const { data: result, error } = await supabase
+            .from('submissions')
+            .insert([{
+                company_name: data.company_name || null,
+                contact_email: data.contact_email || null,
+                contact_phone: data.contact_phone || null,
+                company_size: data.company_size || null,
+                company_type: data.company_type || null,
+                technology_name: data.technology_name || null,
+                technology_description: data.technology_description || null,
+                detailed_description: data.detailed_description || null,
+                technology_category: data.technology_category || null,
+                unique_value_proposition: data.unique_value_proposition || null,
+                military_applications: data.military_applications || null,
+                commercial_applications: data.commercial_applications || null,
+                trl_level: data.trl_level || null,
+                mrl_level: data.mrl_level || null,
+                development_stage: data.development_stage || null,
+                ip_status: data.ip_status || null,
+                team_size: data.team_size || null,
+                team_expertise: data.team_expertise || null,
+                funding_pathway: data.funding_pathway || null,
+                funding_amount_requested: data.funding_amount_requested || null,
+                previous_fuze_awards: data.previous_fuze_awards || null,
+                previous_fuze_amount: data.previous_fuze_amount || null,
+                development_timeline: data.development_timeline || null,
+                sam_gov_registered: data.sam_gov_registered || null,
+                dsip_registered: data.dsip_registered || null,
+                capability_score: data.capability_score || null,
+                ai_assessment: data.ai_assessment || null,
+                recommendation: data.recommendation || null,
+                conversation_transcript: data.conversation_transcript || null
+            }])
+            .select();
 
-    const values = [
-        data.company_name || null,
-        data.contact_email || null,
-        data.contact_phone || null,
-        data.company_size || null,
-        data.company_type || null,
-        data.technology_name || null,
-        data.technology_description || null,
-        data.detailed_description || null,
-        data.technology_category || null,
-        data.unique_value_proposition || null,
-        data.military_applications || null,
-        data.commercial_applications || null,
-        data.trl_level || null,
-        data.mrl_level || null,
-        data.development_stage || null,
-        data.ip_status || null,
-        data.team_size || null,
-        data.team_expertise || null,
-        data.funding_pathway || null,
-        data.funding_amount_requested || null,
-        data.previous_fuze_awards || null,
-        data.previous_fuze_amount || null,
-        data.development_timeline || null,
-        data.sam_gov_registered || null,
-        data.dsip_registered || null,
-        data.capability_score || null,
-        data.ai_assessment || null,
-        data.recommendation || null,
-        data.conversation_transcript || null
-    ];
-
-    db.run(query, values, function(err) {
-        if (err) {
-            callback(err, null);
-        } else {
-            callback(null, { id: this.lastID });
-        }
-    });
+        if (error) throw error;
+        return { id: result[0].id };
+    } catch (error) {
+        throw new Error(`Failed to save submission: ${error.message}`);
+    }
 }
 
 // Get all submissions
-function getAllSubmissions(callback) {
-    const query = 'SELECT * FROM submissions ORDER BY created_at DESC';
-    db.all(query, [], (err, rows) => {
-        if (err) {
-            callback(err, null);
-        } else {
-            callback(null, rows);
-        }
-    });
+async function getAllSubmissions() {
+    try {
+        const { data, error } = await supabase
+            .from('submissions')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        return data;
+    } catch (error) {
+        throw new Error(`Failed to fetch submissions: ${error.message}`);
+    }
 }
 
 // Get a single submission by ID
-function getSubmissionById(id, callback) {
-    const query = 'SELECT * FROM submissions WHERE id = ?';
-    db.get(query, [id], (err, row) => {
-        if (err) {
-            callback(err, null);
-        } else {
-            callback(null, row);
+async function getSubmissionById(id) {
+    try {
+        const { data, error } = await supabase
+            .from('submissions')
+            .select('*')
+            .eq('id', id)
+            .single();
+
+        if (error) {
+            if (error.code === 'PGRST116') return null; // Not found
+            throw error;
         }
-    });
+        return data;
+    } catch (error) {
+        throw new Error(`Failed to fetch submission: ${error.message}`);
+    }
 }
 
 // Update submission
-function updateSubmission(id, data, callback) {
-    const fields = Object.keys(data).map(key => `${key} = ?`).join(', ');
-    const values = Object.values(data);
-    values.push(id);
+async function updateSubmission(id, data) {
+    try {
+        const { error, count } = await supabase
+            .from('submissions')
+            .update({
+                ...data,
+                updated_at: new Date().toISOString()
+            })
+            .eq('id', id);
 
-    const query = `UPDATE submissions SET ${fields}, updated_at = CURRENT_TIMESTAMP WHERE id = ?`;
-
-    db.run(query, values, function(err) {
-        if (err) {
-            callback(err, null);
-        } else {
-            callback(null, { changes: this.changes });
-        }
-    });
+        if (error) throw error;
+        return { changes: count || 0 };
+    } catch (error) {
+        throw new Error(`Failed to update submission: ${error.message}`);
+    }
 }
 
 // Delete submission
-function deleteSubmission(id, callback) {
-    const query = 'DELETE FROM submissions WHERE id = ?';
-    db.run(query, [id], function(err) {
-        if (err) {
-            callback(err, null);
-        } else {
-            callback(null, { changes: this.changes });
-        }
-    });
+async function deleteSubmission(id) {
+    try {
+        const { error, count } = await supabase
+            .from('submissions')
+            .delete()
+            .eq('id', id);
+
+        if (error) throw error;
+        return { changes: count || 0 };
+    } catch (error) {
+        throw new Error(`Failed to delete submission: ${error.message}`);
+    }
 }
 
 // Get submission statistics
-function getStatistics(callback) {
-    const query = `
-        SELECT
-            COUNT(*) as total_submissions,
-            AVG(capability_score) as avg_score,
-            COUNT(CASE WHEN sam_gov_registered = 1 THEN 1 END) as sam_registered,
-            COUNT(CASE WHEN trl_level >= 7 THEN 1 END) as high_trl
-        FROM submissions
-    `;
+async function getStatistics() {
+    try {
+        // Get total count
+        const { count: total_submissions } = await supabase
+            .from('submissions')
+            .select('*', { count: 'exact', head: true });
 
-    db.get(query, [], (err, row) => {
-        if (err) {
-            callback(err, null);
-        } else {
-            callback(null, row);
-        }
-    });
+        // Get average score (need to fetch all for calculation)
+        const { data: scores } = await supabase
+            .from('submissions')
+            .select('capability_score');
+
+        const validScores = scores?.filter(s => s.capability_score != null).map(s => s.capability_score) || [];
+        const avg_score = validScores.length > 0
+            ? validScores.reduce((a, b) => a + b, 0) / validScores.length
+            : 0;
+
+        // Get SAM registered count
+        const { count: sam_registered } = await supabase
+            .from('submissions')
+            .select('*', { count: 'exact', head: true })
+            .eq('sam_gov_registered', true);
+
+        // Get high TRL count
+        const { count: high_trl } = await supabase
+            .from('submissions')
+            .select('*', { count: 'exact', head: true })
+            .gte('trl_level', 7);
+
+        return {
+            total_submissions: total_submissions || 0,
+            avg_score: avg_score || 0,
+            sam_registered: sam_registered || 0,
+            high_trl: high_trl || 0
+        };
+    } catch (error) {
+        throw new Error(`Failed to fetch statistics: ${error.message}`);
+    }
 }
 
 module.exports = {
-    db,
     saveSubmission,
     getAllSubmissions,
     getSubmissionById,
