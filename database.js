@@ -28,6 +28,7 @@ function initializeDatabase() {
             -- Technology Details
             technology_name TEXT,
             technology_description TEXT,
+            detailed_description TEXT,
             technology_category TEXT,
             unique_value_proposition TEXT,
             military_applications TEXT,
@@ -80,7 +81,7 @@ function saveSubmission(data, callback) {
     const query = `
         INSERT INTO submissions (
             company_name, contact_email, contact_phone, company_size, company_type,
-            technology_name, technology_description, technology_category,
+            technology_name, technology_description, detailed_description, technology_category,
             unique_value_proposition, military_applications, commercial_applications,
             trl_level, mrl_level, development_stage, ip_status,
             team_size, team_expertise,
@@ -89,7 +90,7 @@ function saveSubmission(data, callback) {
             sam_gov_registered, dsip_registered,
             capability_score, ai_assessment, recommendation,
             conversation_transcript
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const values = [
@@ -100,6 +101,7 @@ function saveSubmission(data, callback) {
         data.company_type || null,
         data.technology_name || null,
         data.technology_description || null,
+        data.detailed_description || null,
         data.technology_category || null,
         data.unique_value_proposition || null,
         data.military_applications || null,

@@ -437,6 +437,28 @@
 
                 const detailContent = document.getElementById('detailContent');
                 detailContent.innerHTML = `
+                    <div style="background: #1a1a1a; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #0066cc;">
+                        <h3 style="color: #0066cc; margin: 0 0 15px 0; font-size: 18px;">📋 Detailed Technical Description</h3>
+                        <div style="color: #e0e0e0; line-height: 1.8; white-space: pre-wrap;">${submission.detailed_description || 'No detailed description available'}</div>
+                    </div>
+
+                    <div style="background: #1a1a1a; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #cc6600;">
+                        <h3 style="color: #cc6600; margin: 0 0 15px 0; font-size: 18px;">🎯 AI Military Value Analysis</h3>
+                        <div style="color: #e0e0e0; line-height: 1.8; white-space: pre-wrap;">${submission.ai_assessment || 'No AI assessment available'}</div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                        <div style="background: #1a1a1a; padding: 15px; border-radius: 8px;">
+                            <div style="color: #888; font-size: 12px; margin-bottom: 5px;">Capability Score</div>
+                            <div style="color: #0066cc; font-size: 32px; font-weight: 600;">${submission.capability_score?.toFixed(1) || 'N/A'}<span style="font-size: 16px; color: #666;">/10</span></div>
+                        </div>
+                        <div style="background: #1a1a1a; padding: 15px; border-radius: 8px;">
+                            <div style="color: #888; font-size: 12px; margin-bottom: 5px;">Recommendation</div>
+                            <div style="color: #e0e0e0; font-size: 20px; font-weight: 600;">${submission.recommendation || 'N/A'}</div>
+                        </div>
+                    </div>
+
+                    <h3 style="color: #e0e0e0; margin: 30px 0 15px 0; font-size: 16px; border-bottom: 1px solid #333; padding-bottom: 10px;">Company Information</h3>
                     <div class="detail-row">
                         <div class="detail-label">Company Name</div>
                         <div class="detail-value">${submission.company_name || 'N/A'}</div>
@@ -446,11 +468,25 @@
                         <div class="detail-value">${submission.contact_email || 'N/A'}</div>
                     </div>
                     <div class="detail-row">
+                        <div class="detail-label">Contact Phone</div>
+                        <div class="detail-value">${submission.contact_phone || 'N/A'}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Company Size</div>
+                        <div class="detail-value">${submission.company_size || 'N/A'}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Company Type</div>
+                        <div class="detail-value">${submission.company_type || 'N/A'}</div>
+                    </div>
+
+                    <h3 style="color: #e0e0e0; margin: 30px 0 15px 0; font-size: 16px; border-bottom: 1px solid #333; padding-bottom: 10px;">Technology Details</h3>
+                    <div class="detail-row">
                         <div class="detail-label">Technology Name</div>
                         <div class="detail-value">${submission.technology_name || 'N/A'}</div>
                     </div>
                     <div class="detail-row">
-                        <div class="detail-label">Description</div>
+                        <div class="detail-label">Brief Description</div>
                         <div class="detail-value">${submission.technology_description || 'N/A'}</div>
                     </div>
                     <div class="detail-row">
@@ -458,9 +494,33 @@
                         <div class="detail-value">${submission.technology_category || 'N/A'}</div>
                     </div>
                     <div class="detail-row">
+                        <div class="detail-label">Military Applications</div>
+                        <div class="detail-value">${submission.military_applications || 'N/A'}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Commercial Applications</div>
+                        <div class="detail-value">${submission.commercial_applications || 'N/A'}</div>
+                    </div>
+
+                    <h3 style="color: #e0e0e0; margin: 30px 0 15px 0; font-size: 16px; border-bottom: 1px solid #333; padding-bottom: 10px;">Technical Maturity</h3>
+                    <div class="detail-row">
                         <div class="detail-label">TRL Level</div>
                         <div class="detail-value">${submission.trl_level || 'N/A'}</div>
                     </div>
+                    <div class="detail-row">
+                        <div class="detail-label">MRL Level</div>
+                        <div class="detail-value">${submission.mrl_level || 'N/A'}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Development Stage</div>
+                        <div class="detail-value">${submission.development_stage || 'N/A'}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">IP Status</div>
+                        <div class="detail-value">${submission.ip_status || 'N/A'}</div>
+                    </div>
+
+                    <h3 style="color: #e0e0e0; margin: 30px 0 15px 0; font-size: 16px; border-bottom: 1px solid #333; padding-bottom: 10px;">Funding Information</h3>
                     <div class="detail-row">
                         <div class="detail-label">Funding Pathway</div>
                         <div class="detail-value">${submission.funding_pathway || 'N/A'}</div>
@@ -470,16 +530,28 @@
                         <div class="detail-value">$${submission.funding_amount_requested?.toLocaleString() || 'N/A'}</div>
                     </div>
                     <div class="detail-row">
-                        <div class="detail-label">Capability Score</div>
-                        <div class="detail-value">${submission.capability_score?.toFixed(1) || 'N/A'} / 10</div>
+                        <div class="detail-label">Development Timeline</div>
+                        <div class="detail-value">${submission.development_timeline || 'N/A'}</div>
+                    </div>
+
+                    <h3 style="color: #e0e0e0; margin: 30px 0 15px 0; font-size: 16px; border-bottom: 1px solid #333; padding-bottom: 10px;">Team</h3>
+                    <div class="detail-row">
+                        <div class="detail-label">Team Size</div>
+                        <div class="detail-value">${submission.team_size || 'N/A'}</div>
                     </div>
                     <div class="detail-row">
-                        <div class="detail-label">AI Assessment</div>
-                        <div class="detail-value">${submission.ai_assessment || 'N/A'}</div>
+                        <div class="detail-label">Team Expertise</div>
+                        <div class="detail-value">${submission.team_expertise || 'N/A'}</div>
+                    </div>
+
+                    <h3 style="color: #e0e0e0; margin: 30px 0 15px 0; font-size: 16px; border-bottom: 1px solid #333; padding-bottom: 10px;">Government Registrations</h3>
+                    <div class="detail-row">
+                        <div class="detail-label">SAM.gov Registered</div>
+                        <div class="detail-value">${submission.sam_gov_registered ? 'Yes' : 'No'}</div>
                     </div>
                     <div class="detail-row">
-                        <div class="detail-label">Recommendation</div>
-                        <div class="detail-value">${submission.recommendation || 'N/A'}</div>
+                        <div class="detail-label">DSIP Status</div>
+                        <div class="detail-value">${submission.dsip_registered ? 'Registered' : 'Not Registered'}</div>
                     </div>
                 `;
 

@@ -539,46 +539,100 @@ Start by warmly welcoming them and asking about their company and innovation.`;
             }
         }
 
-        // Extract structured data from conversation
-        function extractSubmissionData() {
+        // Extract structured data from conversation using GPT-4
+        async function extractSubmissionData() {
             const conversationText = conversationHistory
                 .filter(msg => msg.role !== 'system')
                 .map(msg => `${msg.role}: ${msg.content}`)
                 .join('\n\n');
 
-            // Basic extraction - in a real system, you'd use GPT to parse this more intelligently
-            const data = {
-                company_name: '',
-                contact_email: '',
-                contact_phone: '',
-                company_size: '',
-                company_type: '',
-                product_name: '',
-                product_description: '',
-                technology_category: '',
-                unique_value_proposition: '',
-                military_applications: '',
-                commercial_applications: '',
-                trl_level: '',
-                mrl_level: '',
-                development_stage: '',
-                ip_status: '',
-                team_size: '',
-                team_expertise: '',
-                funding_pathway: '',
-                funding_amount: '',
-                previous_awards: '',
-                timeline: '',
-                sam_registered: '',
-                dsip_status: '',
-                assessment_score: '',
-                assessment_report: '',
-                recommendation: '',
-                full_conversation: conversationText,
-                timestamp: new Date().toISOString()
-            };
+            // Use GPT-4 to extract structured data and generate detailed analysis
+            const extractionPrompt = `You are a data extraction specialist for Army FUZE submissions. Analyze the following conversation transcript and extract structured data.
 
-            return data;
+CONVERSATION TRANSCRIPT:
+${conversationText}
+
+YOUR TASK:
+Extract ALL mentioned information from the conversation and provide it in JSON format. For fields not mentioned, use null.
+
+CRITICAL: You must provide these two detailed outputs:
+1. "detailed_description": A comprehensive 3-5 paragraph technical description of the technology. Include: how it works, key technical specifications, unique innovations, current development state, and future potential. Be thorough and technical.
+
+2. "ai_assessment": A brutally honest 2-3 paragraph military value analysis. Answer: Is this valuable to the military? Why or why not? What are the strengths and weaknesses? What are the risks? Be direct and critical where needed.
+
+Return ONLY valid JSON in this exact format (no markdown, no backticks):
+{
+  "company_name": "string or null",
+  "contact_email": "string or null",
+  "contact_phone": "string or null",
+  "company_size": "string or null",
+  "company_type": "string or null",
+  "technology_name": "string or null",
+  "technology_description": "brief 1-sentence summary",
+  "detailed_description": "REQUIRED: 3-5 paragraph detailed technical description",
+  "technology_category": "string or null",
+  "unique_value_proposition": "string or null",
+  "military_applications": "string or null",
+  "commercial_applications": "string or null",
+  "trl_level": number or null,
+  "mrl_level": number or null,
+  "development_stage": "string or null",
+  "ip_status": "string or null",
+  "team_size": number or null,
+  "team_expertise": "string or null",
+  "funding_pathway": "string or null",
+  "funding_amount_requested": number or null,
+  "previous_fuze_awards": "string or null",
+  "previous_fuze_amount": number or null,
+  "development_timeline": "string or null",
+  "sam_gov_registered": boolean or null,
+  "dsip_registered": boolean or null,
+  "capability_score": number (0-10) or null,
+  "ai_assessment": "REQUIRED: 2-3 paragraph brutally honest military value analysis",
+  "recommendation": "Strong Fit / Moderate Fit / Needs Development / Not Ready",
+  "conversation_transcript": "${conversationText}",
+  "timestamp": "${new Date().toISOString()}"
+}`;
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: 'gpt-4',
+                        messages: [
+                            { role: 'system', content: 'You are a data extraction specialist. Return only valid JSON, no markdown formatting.' },
+                            { role: 'user', content: extractionPrompt }
+                        ],
+                        max_tokens: 2000,
+                        temperature: 0.3
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Extraction failed');
+                }
+
+                const data = await response.json();
+                const extracted = data.choices[0].message.content;
+
+                // Parse JSON response
+                const jsonMatch = extracted.match(/\{[\s\S]*\}/);
+                if (jsonMatch) {
+                    return JSON.parse(jsonMatch[0]);
+                } else {
+                    throw new Error('No JSON found in response');
+                }
+            } catch (error) {
+                console.error('Extraction error:', error);
+                // Fallback to basic data
+                return {
+                    conversation_transcript: conversationText,
+                    timestamp: new Date().toISOString()
+                };
+            }
         }
 
         // Submit conversation to database
@@ -589,10 +643,14 @@ Start by warmly welcoming them and asking about their company and innovation.`;
                 messageInput.disabled = true;
                 micButton.disabled = true;
 
-                // Show submission message
-                addMessage('📋 Submitting your information to the FUZE team...', 'assistant');
+                // Show processing message
+                addMessage('📋 Analyzing conversation and extracting data...', 'assistant');
 
-                const submissionData = extractSubmissionData();
+                // Extract structured data using AI
+                const submissionData = await extractSubmissionData();
+
+                // Show submission message
+                addMessage('💾 Submitting to FUZE database...', 'assistant');
 
                 const response = await fetch('/api/submissions', {
                     method: 'POST',
