@@ -9,12 +9,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --color-primary-blue: #0072ce;
-            --color-accent-yellow: #ffcc01;
-            --color-accent-green: #6da34d;
+            --color-army-gold: #FFC72C;
+            --color-fuze-white: #FFFFFF;
+            --color-accent-blue: #0066CC;
             --color-muted-gray: #c5c5c5;
-            --color-white: #ffffff;
-            --color-black: #000000;
+            --color-background: #000000;
             --font-heading: 'Bricolage Grotesque', sans-serif;
             --font-body: 'DM Sans', sans-serif;
             --spacing-xs: 8px;
@@ -33,7 +32,7 @@
             font-family: var(--font-body);
             font-size: 17px;
             line-height: 1.36em;
-            background-color: var(--color-black);
+            background-color: var(--color-background);
             color: var(--color-muted-gray);
             height: 100vh;
             overflow: hidden;
@@ -45,7 +44,7 @@
             height: 100vh;
             max-width: 700px;
             margin: 0 auto;
-            background-color: var(--color-black);
+            background-color: var(--color-background);
         }
 
         .chat-header {
@@ -63,7 +62,15 @@
             font-size: 28px;
             font-weight: 400;
             letter-spacing: -1px;
-            color: var(--color-white);
+            color: var(--color-fuze-white);
+        }
+
+        .chat-header h1 .army-text {
+            color: var(--color-army-gold);
+            font-size: 16px;
+            display: block;
+            font-weight: 600;
+            letter-spacing: 2px;
         }
 
         .chat-messages {
@@ -84,7 +91,7 @@
         }
 
         .chat-messages::-webkit-scrollbar-thumb {
-            background: var(--color-primary-blue);
+            background: var(--color-army-gold);
             border-radius: 4px;
         }
 
@@ -128,13 +135,13 @@
         }
 
         .message.user .message-avatar {
-            background-color: var(--color-accent-yellow);
-            color: var(--color-black);
+            background-color: var(--color-army-gold);
+            color: var(--color-background);
         }
 
         .message.assistant .message-avatar {
-            background-color: var(--color-primary-blue);
-            color: var(--color-white);
+            background-color: var(--color-accent-blue);
+            color: var(--color-fuze-white);
         }
 
         .message-content {
@@ -146,9 +153,9 @@
         }
 
         .message.user .message-content {
-            background-color: var(--color-primary-blue);
-            color: var(--color-white);
-            border: 1px solid var(--color-primary-blue);
+            background-color: var(--color-accent-blue);
+            color: var(--color-fuze-white);
+            border: 1px solid var(--color-accent-blue);
         }
 
         .message.assistant .message-content {
@@ -175,7 +182,7 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 30px;
             background-color: rgba(255, 255, 255, 0.05);
-            color: var(--color-white);
+            color: var(--color-fuze-white);
             font-family: var(--font-body);
             font-size: 17px;
             outline: none;
@@ -187,7 +194,7 @@
         }
 
         .chat-input:focus {
-            border-color: var(--color-primary-blue);
+            border-color: var(--color-accent-blue);
             background-color: rgba(255, 255, 255, 0.08);
         }
 
@@ -195,8 +202,8 @@
             padding: 12px 24px;
             border: none;
             border-radius: 30px;
-            background-color: var(--color-primary-blue);
-            color: var(--color-white);
+            background-color: var(--color-accent-blue);
+            color: var(--color-fuze-white);
             font-family: var(--font-body);
             font-size: 17px;
             font-weight: 500;
@@ -226,7 +233,7 @@
             border: none;
             border-radius: 50%;
             background-color: rgba(255, 255, 255, 0.1);
-            color: var(--color-white);
+            color: var(--color-fuze-white);
             font-size: 20px;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -336,7 +343,7 @@
         .empty-state-icon {
             font-size: 64px;
             margin-bottom: var(--spacing-md);
-            color: var(--color-primary-blue);
+            color: var(--color-accent-blue);
             opacity: 0.5;
         }
 
@@ -352,8 +359,10 @@
 <body>
     <div class="chat-container">
         <div class="chat-header">
-            <h1>FUZE Submission Portal</h1>
-            <div id="questionCounter" style="font-size: 14px; color: #888; margin-top: 8px;">Question 0 of 20</div>
+            <div>
+                <h1><span class="army-text">ARMY</span>FUZE Submission Portal</h1>
+                <div id="questionCounter" style="font-size: 14px; color: #888; margin-top: 8px;">Question 0 of 20</div>
+            </div>
         </div>
 
         <div class="chat-messages" id="chatMessages">
