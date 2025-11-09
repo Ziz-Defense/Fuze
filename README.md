@@ -2,6 +2,12 @@
 
 AI-powered conversational submission assessment system for the Army FUZE program. This portal provides a chat-centric interface for innovators to submit technology proposals, with automated capability assessment and scoring.
 
+## 🚀 Live Demo
+
+**Production URL:** https://fuze-portal.vercel.app
+
+Try the live portal to experience the AI-powered submission process!
+
 ## About Army FUZE
 
 Army FUZE is a venture-capital-style program investing ~$750M/year in defense technology companies through:
