@@ -68,7 +68,28 @@ Army FUZE is a venture-capital-style program investing ~$750M/year in defense te
 - **Backend**: Node.js + Express.js
 - **Database**: SQLite (lightweight, file-based)
 - **AI**: OpenAI GPT-4 for conversational intake and assessment
+- **Voice Input**: OpenAI Whisper API for speech-to-text transcription
 - **Styling**: FUZE.ARMY.MIL brand guidelines (Bricolage Grotesque + DM Sans)
+
+## Security & Architecture
+
+### Secure Backend Proxy
+All OpenAI API calls (chat completions and voice transcription) are routed through secure backend proxy endpoints:
+- `/api/chat` - Proxies GPT-4 chat completions
+- `/api/transcribe` - Proxies Whisper audio transcriptions
+
+**Benefits:**
+- ✅ API key stored securely in server environment variables
+- ✅ Never exposed to client browser or source code
+- ✅ Production-ready security for public deployment
+- ✅ Centralized API usage monitoring and rate limiting
+
+### Data Flow
+1. User interacts with frontend (chat or voice input)
+2. Frontend sends request to backend proxy endpoint
+3. Backend authenticates with OpenAI using server-side API key
+4. Response returned to frontend without exposing credentials
+5. Submission data saved to SQLite database
 
 ## Installation
 
@@ -89,19 +110,13 @@ cd Fuze
 npm install
 ```
 
-3. Configure API keys:
-
-**Backend (optional - for server-side features):**
+3. Configure environment variables:
 ```bash
 cp .env.example .env
 # Edit .env and add your OPENAI_API_KEY
 ```
 
-**Frontend (required - for chat interface):**
-```bash
-cp config.example.js config.js
-# Edit config.js and add your OpenAI API key
-```
+**Security Note:** All OpenAI API calls are now handled securely through backend proxy endpoints. Your API key is stored in environment variables on the server and never exposed to the client browser.
 
 4. Start the server:
 ```bash
