@@ -647,13 +647,19 @@ Return ONLY valid JSON in this exact format (no markdown, no backticks):
 DO NOT include conversation_transcript or timestamp in your JSON output - these will be added automatically.`;
 
             try {
+                console.log('Starting extraction...', {
+                    conversationLength: conversationText.length,
+                    userTextLength: userFullText.length,
+                    model: 'gpt-4-turbo-preview'
+                });
+
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        model: 'gpt-4',
+                        model: 'gpt-4-turbo',
                         messages: [
                             { role: 'system', content: 'You are a data extraction specialist. Return ONLY valid JSON with no markdown code blocks, no backticks, no explanation text - just pure JSON starting with { and ending with }.' },
                             { role: 'user', content: extractionPrompt }
@@ -663,8 +669,12 @@ DO NOT include conversation_transcript or timestamp in your JSON output - these 
                     })
                 });
 
+                console.log('Extraction API response status:', response.status);
+
                 if (!response.ok) {
-                    throw new Error('Extraction failed');
+                    const errorText = await response.text();
+                    console.error('Extraction API error:', errorText);
+                    throw new Error(`Extraction failed: ${response.status} ${errorText}`);
                 }
 
                 const data = await response.json();
