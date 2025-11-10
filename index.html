@@ -657,6 +657,10 @@ DO NOT include conversation_transcript or timestamp in your JSON output - these 
                     extractionModel: 'gpt-4-turbo'
                 });
 
+                // Add timeout to extraction call (60 seconds)
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 60000);
+
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: {
@@ -670,14 +674,17 @@ DO NOT include conversation_transcript or timestamp in your JSON output - these 
                         ],
                         max_tokens: 4500,
                         temperature: 0.2
-                    })
+                    }),
+                    signal: controller.signal
                 });
 
+                clearTimeout(timeoutId);
                 console.log('Extraction API response status:', response.status);
 
                 if (!response.ok) {
                     const errorText = await response.text();
                     console.error('Extraction API error:', errorText);
+                    addMessage(`⚠️ Extraction API error (${response.status}). Saving conversation only...`, 'assistant');
                     throw new Error(`Extraction failed: ${response.status} ${errorText}`);
                 }
 
@@ -710,6 +717,16 @@ DO NOT include conversation_transcript or timestamp in your JSON output - these 
             } catch (error) {
                 console.error('Extraction error:', error);
                 console.error('Error details:', error.message, error.stack);
+
+                // Show user-friendly error message
+                if (error.name === 'AbortError') {
+                    addMessage('⏱️ Extraction timed out after 60 seconds. Saving conversation data only...', 'assistant');
+                } else if (error.message.includes('Failed to fetch')) {
+                    addMessage('🌐 Network error during extraction. Saving conversation data only...', 'assistant');
+                } else {
+                    addMessage(`⚠️ Extraction error: ${error.message}. Saving conversation data only...`, 'assistant');
+                }
+
                 // Fallback to basic data with conversation
                 return {
                     conversation_transcript: conversationText,
