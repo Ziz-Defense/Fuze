@@ -48,6 +48,7 @@ CREATE TABLE IF NOT EXISTS submissions (
 
     -- Metadata
     conversation_transcript TEXT,
+    user_full_text TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );

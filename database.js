@@ -55,7 +55,8 @@ async function saveSubmission(data) {
                 capability_score: data.capability_score || null,
                 ai_assessment: data.ai_assessment || null,
                 recommendation: data.recommendation || null,
-                conversation_transcript: data.conversation_transcript || null
+                conversation_transcript: data.conversation_transcript || null,
+                user_full_text: data.user_full_text || null
             }])
             .select();
 

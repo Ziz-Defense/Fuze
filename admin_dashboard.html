@@ -552,6 +552,11 @@
                         <div class="detail-label">DSIP Status</div>
                         <div class="detail-value">${submission.dsip_registered ? 'Registered' : 'Not Registered'}</div>
                     </div>
+
+                    <div style="background: #1a1a1a; padding: 20px; border-radius: 8px; margin-top: 30px; border-left: 4px solid #6da34d;">
+                        <h3 style="color: #6da34d; margin: 0 0 15px 0; font-size: 18px;">💬 User Responses (Full Text)</h3>
+                        <div style="color: #e0e0e0; line-height: 1.8; white-space: pre-wrap; font-family: 'Courier New', monospace; background: #0a0a0a; padding: 15px; border-radius: 4px; max-height: 500px; overflow-y: auto;">${submission.user_full_text || 'No user responses captured'}</div>
+                    </div>
                 `;
 
                 document.getElementById('detailModal').style.display = 'block';

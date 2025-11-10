@@ -592,6 +592,12 @@ Start by warmly welcoming them and asking about their company and innovation.`;
                 .map(msg => `${msg.role}: ${msg.content}`)
                 .join('\n\n');
 
+            // Capture all user responses for admin review
+            const userFullText = conversationHistory
+                .filter(msg => msg.role === 'user')
+                .map(msg => msg.content)
+                .join('\n\n---\n\n');
+
             // Use GPT-4 to extract structured data and generate detailed analysis
             const extractionPrompt = `You are a data extraction specialist for Army FUZE submissions. Analyze the following conversation transcript and extract structured data.
 
@@ -635,10 +641,10 @@ Return ONLY valid JSON in this exact format (no markdown, no backticks):
   "dsip_registered": boolean or null,
   "capability_score": number (0-10) or null,
   "ai_assessment": "REQUIRED: 2-3 paragraph brutally honest military value analysis",
-  "recommendation": "Strong Fit / Moderate Fit / Needs Development / Not Ready",
-  "conversation_transcript": "${conversationText}",
-  "timestamp": "${new Date().toISOString()}"
-}`;
+  "recommendation": "Strong Fit / Moderate Fit / Needs Development / Not Ready"
+}
+
+DO NOT include conversation_transcript or timestamp in your JSON output - these will be added automatically.`;
 
             try {
                 const response = await fetch('/api/chat', {
@@ -652,7 +658,7 @@ Return ONLY valid JSON in this exact format (no markdown, no backticks):
                             { role: 'system', content: 'You are a data extraction specialist. Return ONLY valid JSON with no markdown code blocks, no backticks, no explanation text - just pure JSON starting with { and ending with }.' },
                             { role: 'user', content: extractionPrompt }
                         ],
-                        max_tokens: 3000,
+                        max_tokens: 4500,
                         temperature: 0.2
                     })
                 });
@@ -675,7 +681,14 @@ Return ONLY valid JSON in this exact format (no markdown, no backticks):
                 if (jsonMatch) {
                     const parsed = JSON.parse(jsonMatch[0]);
                     console.log('Successfully extracted data:', parsed);
-                    return parsed;
+
+                    // Add metadata fields that weren't in AI response
+                    return {
+                        ...parsed,
+                        conversation_transcript: conversationText,
+                        user_full_text: userFullText,
+                        timestamp: new Date().toISOString()
+                    };
                 } else {
                     console.error('No JSON found in extraction response');
                     throw new Error('No JSON found in response');
@@ -686,6 +699,7 @@ Return ONLY valid JSON in this exact format (no markdown, no backticks):
                 // Fallback to basic data with conversation
                 return {
                     conversation_transcript: conversationText,
+                    user_full_text: userFullText,
                     timestamp: new Date().toISOString(),
                     recommendation: 'Needs Development'
                 };
