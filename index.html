@@ -546,7 +546,7 @@ Start by warmly welcoming them and asking about their company and innovation.`;
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        model: 'gpt-4',
+                        model: 'gpt-3.5-turbo',
                         messages: conversationHistory,
                         max_tokens: 500,
                         temperature: 0.7
@@ -650,7 +650,8 @@ DO NOT include conversation_transcript or timestamp in your JSON output - these 
                 console.log('Starting extraction...', {
                     conversationLength: conversationText.length,
                     userTextLength: userFullText.length,
-                    model: 'gpt-4-turbo-preview'
+                    chatModel: 'gpt-3.5-turbo',
+                    extractionModel: 'gpt-4-turbo'
                 });
 
                 const response = await fetch('/api/chat', {
@@ -891,7 +892,7 @@ DO NOT include conversation_transcript or timestamp in your JSON output - these 
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        model: 'gpt-4',
+                        model: 'gpt-3.5-turbo',
                         messages: conversationHistory,
                         max_tokens: 300,
                         temperature: 0.8
