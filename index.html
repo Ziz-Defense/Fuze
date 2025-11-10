@@ -648,11 +648,11 @@ Return ONLY valid JSON in this exact format (no markdown, no backticks):
                     body: JSON.stringify({
                         model: 'gpt-4',
                         messages: [
-                            { role: 'system', content: 'You are a data extraction specialist. Return only valid JSON, no markdown formatting.' },
+                            { role: 'system', content: 'You are a data extraction specialist. Return ONLY valid JSON with no markdown code blocks, no backticks, no explanation text - just pure JSON starting with { and ending with }.' },
                             { role: 'user', content: extractionPrompt }
                         ],
-                        max_tokens: 2000,
-                        temperature: 0.3
+                        max_tokens: 3000,
+                        temperature: 0.2
                     })
                 });
 
@@ -661,21 +661,32 @@ Return ONLY valid JSON in this exact format (no markdown, no backticks):
                 }
 
                 const data = await response.json();
-                const extracted = data.choices[0].message.content;
+                let extracted = data.choices[0].message.content;
+
+                console.log('Raw extraction response:', extracted);
+
+                // Remove markdown code blocks if present
+                extracted = extracted.replace(/```json\s*/g, '').replace(/```\s*/g, '');
+                extracted = extracted.trim();
 
                 // Parse JSON response
                 const jsonMatch = extracted.match(/\{[\s\S]*\}/);
                 if (jsonMatch) {
-                    return JSON.parse(jsonMatch[0]);
+                    const parsed = JSON.parse(jsonMatch[0]);
+                    console.log('Successfully extracted data:', parsed);
+                    return parsed;
                 } else {
+                    console.error('No JSON found in extraction response');
                     throw new Error('No JSON found in response');
                 }
             } catch (error) {
                 console.error('Extraction error:', error);
-                // Fallback to basic data
+                console.error('Error details:', error.message, error.stack);
+                // Fallback to basic data with conversation
                 return {
                     conversation_transcript: conversationText,
-                    timestamp: new Date().toISOString()
+                    timestamp: new Date().toISOString(),
+                    recommendation: 'Needs Development'
                 };
             }
         }
