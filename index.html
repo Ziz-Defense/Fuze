@@ -672,7 +672,7 @@ DO NOT include conversation_transcript or timestamp in your JSON output - these 
                             { role: 'system', content: 'You are a data extraction specialist. Return ONLY valid JSON with no markdown code blocks, no backticks, no explanation text - just pure JSON starting with { and ending with }.' },
                             { role: 'user', content: extractionPrompt }
                         ],
-                        max_tokens: 4500,
+                        max_tokens: 4096,
                         temperature: 0.2
                     }),
                     signal: controller.signal

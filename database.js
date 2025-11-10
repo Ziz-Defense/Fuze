@@ -104,16 +104,17 @@ async function getSubmissionById(id) {
 // Update submission
 async function updateSubmission(id, data) {
     try {
-        const { error, count } = await supabase
+        const { data: result, error } = await supabase
             .from('submissions')
             .update({
                 ...data,
                 updated_at: new Date().toISOString()
             })
-            .eq('id', id);
+            .eq('id', id)
+            .select();
 
         if (error) throw error;
-        return { changes: count || 0 };
+        return { changes: result && result.length > 0 ? 1 : 0 };
     } catch (error) {
         throw new Error(`Failed to update submission: ${error.message}`);
     }
